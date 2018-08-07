@@ -95,8 +95,6 @@ bool dfs(int m, int n,int k, bool a_turn)
     bool win = 0;
     if (a_turn)
     {
-        if (!ableToDiscard(a, m, k))
-            return dp[m][n][k][1] = 0;
         if (m == k)
             return dp[m][n][k][1] = 1;
         vector<int>vt;
@@ -120,14 +118,13 @@ bool dfs(int m, int n,int k, bool a_turn)
             win = 0;
             for (int next_card = 1; next_card <= m-k; next_card ++)
             {
-                win |= dfs(m - k,n,next_card,1);
+                if (ableToDiscard(a, m-k, next_card))
+                    win |= dfs(m - k,n,next_card,1);
             }
         }
     }
     else
     {
-        if (!ableToDiscard(b, n, k))
-            return dp[m][n][k][0] = 1;
         if (n == k)
             return dp[m][n][k][0] = 0;
         vector<int>vt;
@@ -150,7 +147,10 @@ bool dfs(int m, int n,int k, bool a_turn)
         {
             win = 1;
             for (int next_card = 1; next_card <= n-k; next_card ++)
-                win &= dfs(m,n-k,next_card,0);
+            {
+                if (ableToDiscard(b, n-k, next_card))
+                    win &= dfs(m,n-k,next_card,0);
+            }
         }
     }
     return dp[m][n][k][a_turn] = win;
@@ -163,11 +163,8 @@ void run(int m, int n)
         if (ableToDiscard(a, m, discard))
         {
             bool win = dfs(m,n,discard,1);
-//            cout << discard <<" "<<win<<endl;
-            if (win)
-            {
-                print(discard,a);
-            }
+            cout<<win<<" ";
+            print(discard,a);
         }
     }
 }
